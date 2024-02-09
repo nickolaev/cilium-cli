@@ -329,6 +329,11 @@ func (t *Test) Run(ctx context.Context, index int) error {
 
 		t.Logf("[-] Scenario [%s]", t.scenarioName(s))
 
+		// Run the Scenario only if we're not in dry-run mode.
+		if t.Context().params.DryRun {
+			continue
+		}
+
 		s.Run(ctx, t)
 	}
 

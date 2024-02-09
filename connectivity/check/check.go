@@ -103,6 +103,8 @@ type Parameters struct {
 	ExternalTargetCAName      string
 
 	Timeout time.Duration
+
+	DryRun bool
 }
 
 type podCIDRs struct {
