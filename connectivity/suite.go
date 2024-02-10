@@ -203,8 +203,10 @@ type Hooks interface {
 }
 
 func Run(ctx context.Context, ct *check.ConnectivityTest, extra Hooks) error {
-	if err := ct.SetupAndValidate(ctx, extra); err != nil {
-		return err
+	if ct.Params().ListOnly == false {
+		if err := ct.SetupAndValidate(ctx, extra); err != nil {
+			return err
+		}
 	}
 
 	renderedTemplates := map[string]string{}
@@ -237,7 +239,9 @@ func Run(ctx context.Context, ct *check.ConnectivityTest, extra Hooks) error {
 		renderedTemplates[key] = val
 	}
 
-	ct.Infof("Cilium version: %v", ct.CiliumVersion)
+	if !ct.Params().ListOnly {
+		ct.Infof("Cilium version: %v", ct.CiliumVersion)
+	}
 
 	// Network Performance Test
 	if ct.Params().Perf {
@@ -1236,7 +1240,15 @@ func Run(ctx context.Context, ct *check.ConnectivityTest, extra Hooks) error {
 		ct.NewTest("check-log-errors").WithScenarios(tests.NoErrorsInLogs(ct.CiliumVersion))
 	}
 
-	return ct.Run(ctx)
+	if ct.Params().ListOnly {
+		testsToRun := ct.TestsToRun()
+		for _, t := range testsToRun {
+			ct.Logf("Would run test: %s", t.Name())
+		}
+		return nil
+	} else {
+		return ct.Run(ctx)
+	}
 }
 
 func withKPRReqForMultiCluster(ct *check.ConnectivityTest, reqs ...features.Requirement) []features.Requirement {

@@ -157,6 +157,24 @@ func (ct *ConnectivityTest) skippedTests() []*Test {
 	return out
 }
 
+func (ct *ConnectivityTest) TestsToRun() []*Test {
+	var out []*Test
+
+	for _, t := range ct.tests {
+		var skipped int
+		for s := range t.scenarios {
+			if !t.Context().params.testEnabled(t.scenarioName(s)) {
+				skipped++
+			}
+		}
+		if skipped != len(t.scenarios) {
+			out = append(out, t)
+		}
+	}
+
+	return out
+}
+
 // skippedScenarios returns a list of Scenarios that were marked as skipped.
 func (ct *ConnectivityTest) skippedScenarios() []Scenario {
 	var out []Scenario

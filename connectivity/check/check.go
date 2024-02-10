@@ -104,7 +104,8 @@ type Parameters struct {
 
 	Timeout time.Duration
 
-	DryRun bool
+	DryRun   bool
+	ListOnly bool
 }
 
 type podCIDRs struct {
